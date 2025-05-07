@@ -1,17 +1,28 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+const express = require("express");
+const mysql = require("mysql2");
+const app = express();
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// 미들웨어
+app.use(express.json());
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// 라우터 등록
+const authRouter = require("./routes/authRouter");
+const nosRouter = require("./routes/nosRouter");
+const dailyReportRouter = require("./routes/dailyReportRouter");
+
+app.use("/auth", authRouter);
+app.use("/api/daily-report", dailyReportRouter);
+app.use("/api/nos", nosRouter);
+
+// MySQL 연결
+const pool = mysql.createPool({
+  host: "localhost",
+  user: "root",
+  password: "wndud",
+  database: "main_data",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+module.exports = pool.promise();
