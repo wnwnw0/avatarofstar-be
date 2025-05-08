@@ -33,7 +33,9 @@ router.get("/:slug", async (req, res) => {
 
 // 공지 작성 (slug 자동 생성, date는 DB에서 자동 저장)
 router.post("/", async (req, res) => {
-  const { title, content } = req.body;
+  const { title, summary, content, date } = req.body;
+  console.log("받은 데이터:", req.body);
+
 
   if (!title || !content) {
     return res.status(400).json({ error: "제목과 내용은 필수입니다." });
@@ -43,8 +45,8 @@ router.post("/", async (req, res) => {
 
   try {
     await db.execute(
-      "INSERT INTO notice_posts (slug, title, content) VALUES (?, ?, ?)",
-      [slug, title, content]
+      "INSERT INTO notice_posts (slug, title, summary, content) VALUES (?, ?, ?, ?)",
+      [slug, title, summary || "", content]
     );
     res.json({ message: "공지 등록 성공", slug });
   } catch (err) {
@@ -52,6 +54,32 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "DB 저장 실패: " + err.message });
   }
 });
+
+router.delete("/:slug", async (req, res) => {
+  try {
+    const [result] = await db.execute("DELETE FROM notice_posts WHERE slug = ?", [req.params.slug]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "글 없음" });
+    res.json({ message: "삭제 완료" });
+  } catch (err) {
+    console.error("❌ 삭제 에러:", err);
+    res.status(500).json({ error: "삭제 실패" });
+  }
+});
+
+router.put("/:slug", async (req, res) => {
+  const { title, summary, content } = req.body;
+  try {
+    await db.execute(
+      "UPDATE notice_posts SET title = ?, summary = ?, content = ? WHERE slug = ?",
+      [title, summary, content, req.params.slug]
+    );
+    res.json({ message: "수정 완료" });
+  } catch (err) {
+    console.error("❌ 수정 에러:", err);
+    res.status(500).json({ error: "수정 실패" });
+  }
+});
+
 
 module.exports = router;
 

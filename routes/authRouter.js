@@ -18,9 +18,9 @@ router.post("/google-login", async (req, res) => {
     const userEmail = payload.email;
 
     if (userEmail === process.env.ADMIN_EMAIL) {
-      res.json({ message: "Admin access granted" });
+      res.json({ message: "Admin access granted", isAdmin:true });
     } else {
-      res.status(403).json({ message: "Access denied" });
+      res.status(403).json({ message: "Access denied", isAdmin: false });
     }
   } catch (error) {
     console.error("❌ Google token verification failed:", error);
