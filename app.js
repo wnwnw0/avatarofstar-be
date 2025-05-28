@@ -18,7 +18,7 @@ app.use("/api/pastQuestion", pastQuestionRouter);
 app.use("/api/getId", getIdRouter);
 app.use('/api/auth', authRouter);
 app.use("/api/notice", noticeRouter);
-app.use("/api/daily-report", dailyReportRouter);
+app.use("/api/dailyreport", dailyReportRouter);
 
 // --- 서버 실행
 app.listen(PORT, () => {

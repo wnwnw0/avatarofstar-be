@@ -1,28 +1,36 @@
+require("dotenv").config();
 const express = require("express");
-const mysql = require("mysql2");
+const cors = require("cors");
+const path = require("path");
+
+const timeQuestionRouter = require("./routes/timeQuestionRouter");
+const pastQuestionRouter = require("./routes/pastQuestionRouter");
+const getIdRouter = require("./routes/getIdRouter");
+const authRouter = require('./routes/authRouter');
+const noticeRouter = require("./routes/noticeRouter");
+const dailyReportRouter = require("./routes/dailyReportRouter");
+const nosRouter = require("./routes/nosRouter");
+
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // 미들웨어
+app.use(cors());
 app.use(express.json());
 
-// 라우터 등록
-const authRouter = require("./routes/authRouter");
-const nosRouter = require("./routes/nosRouter");
-const dailyReportRouter = require("./routes/dailyReportRouter");
-
-app.use("/auth", authRouter);
-app.use("/api/daily-report", dailyReportRouter);
+// 라우터
+app.use("/api/timeQuestion", timeQuestionRouter);
+app.use("/api/pastQuestion", pastQuestionRouter);
+app.use("/api/getId", getIdRouter);
+app.use('/api/auth', authRouter);
+app.use("/api/notice", noticeRouter);
+app.use("/api/dailyreport", dailyReportRouter);
 app.use("/api/nos", nosRouter);
 
-// MySQL 연결
-const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "wndud",
-  database: "main_data",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+// 업로드 파일 정적 서비스
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-module.exports = pool.promise();
+// 서버 실행
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
